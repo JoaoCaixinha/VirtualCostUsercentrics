@@ -1,4 +1,4 @@
-package com.example.virtualcost.ui.theme
+package com.example.app.views.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

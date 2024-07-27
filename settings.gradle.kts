@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "VirtualCost"
 include(":app")
+include(":VirtualCostViews")

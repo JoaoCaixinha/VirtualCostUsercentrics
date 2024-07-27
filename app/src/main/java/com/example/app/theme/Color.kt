@@ -1,4 +1,4 @@
-package com.example.virtualcost.ui.theme
+package com.example.app.views.theme
 
 import androidx.compose.ui.graphics.Color
 
