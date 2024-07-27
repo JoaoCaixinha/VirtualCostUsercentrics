@@ -24,17 +24,15 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
 
 @Composable
-fun VirtualCostCounter(smallLabelText: String,
-                       buttonText: String,
-                       onButtonClick: ()->Unit,
-                       modifier: Modifier = Modifier
+fun VirtualCostCounter(
+    smallLabelText: String,
+    buttonText: String,
+    viewModel: VirtualCostCounterViewModel?
 ) {
-    val counterText = "0"
-
     VirtualCostCounterLayout(
         {
             Text(
-                text = counterText,
+                text = viewModel?.totalCost?.toString() ?: "0",
                 fontSize = 150.sp,
             )
         },
@@ -47,11 +45,11 @@ fun VirtualCostCounter(smallLabelText: String,
         },
         {
             Button(
-                onClick = { onButtonClick() },
+                onClick = { viewModel?.onShowBannerPressed() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 30.dp)
-                    .padding(vertical = 30.dp)
+                    .padding(vertical = 60.dp)
                     .height(60.dp),
                 shape = MaterialTheme.shapes.medium,
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Blue)
@@ -142,6 +140,6 @@ fun GreetingPreview() {
     VirtualCostCounter(
         "Consent Score",
         "Show Consent Banner",
-        {},
-        Modifier)
+        viewModel = null
+    )
 }
