@@ -13,6 +13,7 @@ lifecycleViewmodelKtx = "2.3.1"
 usercentricsUi = "2.11.3"
 appcompat = "1.6.1"
 material = "1.10.0"
+constraintlayout = "2.1.4"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -37,6 +38,7 @@ compose-constraintLayout = { group = "androidx.constraintlayout", name = "constr
 compose-runtime-liveData = { group = "androidx.compose.runtime", name = "runtime-livedata" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
