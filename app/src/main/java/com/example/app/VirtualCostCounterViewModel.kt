@@ -28,7 +28,6 @@ class VirtualCostCounterViewModel : ViewModel() {
         _virtualCostCounterEvents.postValue(VirtualCostCounterEvent.AsUserAsFirstTimeEvent)
 
         Usercentrics.isReady({ status ->
-
             if (status.shouldCollectConsent) {
                 // first time or when prompting updates to the consent services
                 _virtualCostCounterEvents.postValue(VirtualCostCounterEvent.SetUserAsFirstTimeEvent(false))
@@ -62,7 +61,7 @@ class VirtualCostCounterViewModel : ViewModel() {
     }
 
     /*
-   * handles consent accept
+   * handles consent accept and calculates cost according per service
    * */
     fun applyConsent(consents: List<UsercentricsServiceConsent>?) {
         _totalCost.value = 0

@@ -83,7 +83,7 @@ enum class DataCostTable(val dataCollected: String) {
                 // Table increment
                 cost += DataCostTable.getIncrementCost(it)
 
-                // Rule 1: Why do you care?
+                // Rule 1: Banking snoopy
                 // Rule 2: Why do you care?
                 DataCostTable.getExtraPercentageCost(it, onExtraFound)
             }
