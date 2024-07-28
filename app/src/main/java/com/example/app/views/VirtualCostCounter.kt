@@ -1,5 +1,6 @@
 package com.example.app.views
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
 import com.example.app.VirtualCostCounterViewModel
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun VirtualCostCounter(
     smallLabelText: String,
@@ -32,14 +34,14 @@ fun VirtualCostCounter(
     modifier: Modifier,
     viewModel: VirtualCostCounterViewModel?
 ) {
-    var totalCost = "0"
+    var totalCost = 0.0
     viewModel?.let {
-        totalCost = it.totalCost?.observeAsState()?.value.toString()
+        totalCost = it.totalCost?.observeAsState()?.value ?: 0.0
     }
     VirtualCostCounterLayout(
         {
             Text(
-                text = totalCost,
+                text = String.format("%.0f", totalCost),
                 fontSize = 150.sp,
             )
         },
