@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">VirtualCost</string>
+    <string name="consent_score">Consent Score</string>
+    <string name="show_consent_banner">Show Consent Banner</string>
+    <string name="virtualcoststorage">virtualCostStorage</string>
+    <string name="userasgivenforfirsttime">UserAsGivenForFirstTime</string>
+    <string name="UserCentricsSettingsID">gChmbFIdL</string>
 </resources>

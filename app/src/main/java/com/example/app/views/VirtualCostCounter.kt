@@ -12,6 +12,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,17 +23,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
+import com.example.app.VirtualCostCounterViewModel
 
 @Composable
 fun VirtualCostCounter(
     smallLabelText: String,
     buttonText: String,
+    modifier: Modifier,
     viewModel: VirtualCostCounterViewModel?
 ) {
+    var totalCost = "0"
+    viewModel?.let {
+        totalCost = it.totalCost?.observeAsState()?.value.toString()
+    }
     VirtualCostCounterLayout(
         {
             Text(
-                text = viewModel?.totalCost?.toString() ?: "0",
+                text = totalCost,
                 fontSize = 150.sp,
             )
         },
@@ -61,7 +68,7 @@ fun VirtualCostCounter(
                 )
             }
         },
-        Modifier
+        modifier = modifier
     )
 }
 
@@ -138,8 +145,9 @@ private val constraintSet = ConstraintSet {
 @Composable
 fun GreetingPreview() {
     VirtualCostCounter(
-        "Consent Score",
-        "Show Consent Banner",
+        smallLabelText = "Consent Score",
+        buttonText = "Show Consent Banner",
+        modifier = Modifier,
         viewModel = null
     )
 }
