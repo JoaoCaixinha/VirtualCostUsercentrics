@@ -14,40 +14,40 @@ const val VirtualCostCounter = "VirtualCostCounter"
 
 class VirtualCostCounterViewModel : ViewModel() {
     private val _virtualCostCounterEvents = MutableLiveData<VirtualCostCounterEvent>()
-    public val virtualCostCounterEvents: LiveData<VirtualCostCounterEvent> =
+    val virtualCostCounterEvents: LiveData<VirtualCostCounterEvent> =
         _virtualCostCounterEvents
 
     private val _totalCost = MutableLiveData<Int>(0)
     val totalCost: LiveData<Int> = _totalCost.distinctUntilChanged()
 
-    private val _isFirstTime = MutableLiveData<Boolean>(false)
+    private val _isFirstTime = MutableLiveData<Boolean>(true)
+    val isFirstTime: LiveData<Boolean> = _isFirstTime.distinctUntilChanged()
+
+    init {
+        //get storage info if user as pass from first layer
+        _virtualCostCounterEvents.postValue(VirtualCostCounterEvent.AsUserAsFirstTimeEvent)
+
+        Usercentrics.isReady({ status ->
+
+            if (status.shouldCollectConsent) {
+                // first time or when prompting updates to the consent services
+                _virtualCostCounterEvents.postValue(VirtualCostCounterEvent.SetUserAsFirstTimeEvent(false))
+            } else {
+                applyConsent(status.consents)
+            }
+        }, { error ->
+            // on error lets back to first layer
+            _virtualCostCounterEvents.postValue(VirtualCostCounterEvent.SetUserAsFirstTimeEvent(true))
+            //reset usercentrics sdk
+            Usercentrics.reset()
+        })
+    }
 
     /*
    * stores variable if user as accepted the banner first layer
    * */
     fun setUserAsFirstTime(given: Boolean) {
         _isFirstTime.value = given
-        _virtualCostCounterEvents.postValue(VirtualCostCounterEvent.AsUserAsFirstTime)
-    }
-
-    init {
-        //get storage info if user as pass from first layer
-        _virtualCostCounterEvents.postValue(VirtualCostCounterEvent.AsUserAsFirstTime)
-
-        Usercentrics.isReady({ status ->
-
-            if (status.shouldCollectConsent) {
-                // first time or when prompting updates to the consent services
-                _virtualCostCounterEvents.postValue(VirtualCostCounterEvent.SetUserAsFirstTime(false))
-            } else {
-                applyConsent(status.consents)
-            }
-        }, { error ->
-            // on error lets back to first layer
-            _virtualCostCounterEvents.postValue(VirtualCostCounterEvent.SetUserAsFirstTime(true))
-            //reset usercentrics sdk
-            Usercentrics.reset()
-        })
     }
 
     /*
@@ -97,8 +97,8 @@ class VirtualCostCounterViewModel : ViewModel() {
     sealed class VirtualCostCounterEvent(val data: Any?) {
         data object ShowFirstLayer : VirtualCostCounterEvent(null)
         data object ShowSecondLayer : VirtualCostCounterEvent(null)
-        data class SetUserAsFirstTime(val given: Boolean) : VirtualCostCounterEvent(given)
-        data object AsUserAsFirstTime : VirtualCostCounterEvent(null)
+        data class SetUserAsFirstTimeEvent(val given: Boolean) : VirtualCostCounterEvent(given)
+        data object AsUserAsFirstTimeEvent : VirtualCostCounterEvent(null)
     }
 }
 
