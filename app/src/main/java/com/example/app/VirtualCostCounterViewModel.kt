@@ -21,6 +21,9 @@ class VirtualCostCounterViewModel : ViewModel() {
 
     private val _isFirstTime = MutableLiveData<Boolean>(false)
 
+    /*
+   * stores variable if user as accepted the banner first layer
+   * */
     fun setUserAsFirstTime(given: Boolean) {
         _isFirstTime.value = given
         _virtualCostCounterEvents.postValue(VirtualCostCounterEvent.AsUserAsFirstTime)
@@ -39,10 +42,16 @@ class VirtualCostCounterViewModel : ViewModel() {
                 applyConsent(status.consents)
             }
         }, { error ->
-            // Handle non-localized error
+            // on error lets back to first layer
+            _virtualCostCounterEvents.postValue(VirtualCostCounterEvent.SetUserAsFirstTime(true))
+            //reset usercentrics sdk
+            Usercentrics.reset()
         })
     }
 
+    /*
+   * button action show consent banner
+   * */
     fun onShowBannerPressed() {
         if (_isFirstTime.value == true) {
             _virtualCostCounterEvents.postValue(VirtualCostCounterEvent.ShowFirstLayer)
@@ -51,6 +60,9 @@ class VirtualCostCounterViewModel : ViewModel() {
         }
     }
 
+    /*
+   * handles consent accept
+   * */
     fun applyConsent(consents: List<UsercentricsServiceConsent>?) {
         _totalCost.value = 0
         val services = Usercentrics.instance.getCMPData().services
@@ -64,13 +76,16 @@ class VirtualCostCounterViewModel : ViewModel() {
                     }
                 }
 
-                false -> {}// ignore not consented
+                false -> {}// ignore not consent given
             }
         }
         val total = _totalCost.value
         Log.d(VirtualCostCounter, "Total = $total")
     }
 
+    /*
+    * find service with same id than consent
+    * */
     private fun findService(
         consentTemplateId: String,
         services: List<UsercentricsService>
@@ -80,21 +95,15 @@ class VirtualCostCounterViewModel : ViewModel() {
 
     private fun calculateCost(service: UsercentricsService): Double {
         var cost = 0.0
-        var extraFound = false
+        var extraValue:Double = 1.0
         service.dataCollectedList.forEach { data ->
-            val dataCollected = DataCostTable.getEnumFromDataCollectedString(data)
-            // if dataCollected is null, the string in dataCollectedList is not in the enum DataCostTable.
-            // on the exercise there no specification how to handle the situation
-            dataCollected?.let {
-                cost += DataCostTable.getIncrementCost(dataCollected)
-                val asExtraCost = DataCostTable.getExtraPercentageCost(dataCollected)
-                if (!extraFound && asExtraCost > 10.0) {
-                    extraFound = true
-                    cost *= asExtraCost
-                }
-            }
+            cost = DataCostTable.calculateCost(data, cost) { extraValue += it }
         }
 
+        //apply extra from rules 1 or 2 if present
+        cost *= extraValue
+
+        // Check for "Rule 3: The good citizen"
         cost = DataCostTable.getBonusPercentage(cost, service.dataCollectedList.count())
 
         return cost
