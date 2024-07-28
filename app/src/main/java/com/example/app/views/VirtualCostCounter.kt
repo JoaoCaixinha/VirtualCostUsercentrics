@@ -79,7 +79,7 @@ private fun VirtualCostCounterLayout(
     button: @Composable () -> Unit,
     modifier: Modifier = Modifier,
 
-) {
+    ) {
     ConstraintLayout(
         constraintSet = constraintSet,
         modifier = Modifier

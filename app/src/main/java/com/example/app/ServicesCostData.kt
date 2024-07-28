@@ -1,10 +1,8 @@
 package com.example.app
 
-
-const val DEFAULT_EXTRA: Double = 1.0
 const val MIN_BONUS_VALUE: Int = 4
 
-enum class DataCostTable(val dataCollected: String){
+enum class DataCostTable(val dataCollected: String) {
     // ON TABLE
     CONFIGURATION_OF_APP_SETTINGS("Configuration of app settings "),
     USER_BEHAVIOUR("User behaviour"),
@@ -27,11 +25,11 @@ enum class DataCostTable(val dataCollected: String){
     GEOGRAPHIC_LOCATION("Geographic location");
 
     companion object {
-        fun getEnumFromDataCollectedString(data: String): DataCostTable? {
-            return DataCostTable.values().find { it.toString() == data }
+        private fun getEnumFromDataCollectedString(data: String): DataCostTable? {
+            return DataCostTable.values().find { it.dataCollected == data || it.toString() == data }
         }
 
-        fun getIncrementCost(data: DataCostTable): Int {
+        private fun getIncrementCost(data: DataCostTable): Int {
             return when (data) {
                 IP_ADDRESS, USER_BEHAVIOUR, ADVERTISING_IDENTIFIER -> 2
                 USER_AGENT, BROWSER_INFORMATION -> 3
@@ -47,22 +45,33 @@ enum class DataCostTable(val dataCollected: String){
             }
         }
 
-        private fun getExtraPercentageCost(data: DataCostTable, onExtraFound:(Double)->Unit): Unit {
+        private fun getExtraPercentageCost(
+            data: DataCostTable,
+            onExtraFound: (DataCostTable, Double) -> Unit
+        ): Unit {
             return when (data) {
-                PURCHASE_ACTIVITY, BANK_DETAILS, CREDIT_DEBIT_CARD_NUMBER -> onExtraFound(0.10)
-                SEARCH_TERMS, GEOGRAPHIC_LOCATION, IP_ADDRESS -> onExtraFound(0.27)
+                PURCHASE_ACTIVITY, BANK_DETAILS, CREDIT_DEBIT_CARD_NUMBER -> onExtraFound(
+                    data,
+                    0.10
+                )
+
+                SEARCH_TERMS, GEOGRAPHIC_LOCATION, IP_ADDRESS -> onExtraFound(data, 0.27)
                 else -> {}
             }
         }
 
-        fun getBonusPercentage(cost:Double, count: Int): Double {
+        fun getBonusPercentage(cost: Double, count: Int): Double {
             return when {
                 count <= MIN_BONUS_VALUE -> cost - (cost * 0.10)
                 else -> cost
             }
         }
 
-        fun calculateCost(data: String, initialCost: Double, onExtraFound:(Double)->Unit): Double {
+        fun calculateCost(
+            data: String,
+            initialCost: Double,
+            onExtraFound: (DataCostTable, Double) -> Unit
+        ): Double {
             var cost = initialCost
             val dataCollected = DataCostTable.getEnumFromDataCollectedString(data)
             // if dataCollected is null, the string in dataCollectedList is not in the enum DataCostTable.
@@ -75,6 +84,30 @@ enum class DataCostTable(val dataCollected: String){
                 // Rule 2: Why do you care?
                 DataCostTable.getExtraPercentageCost(it, onExtraFound)
             }
+
+            return cost
+        }
+
+        fun calculateCost(dataCollectedList: List<String>): Double {
+            var cost = 0.0
+            var extraValue = 1.0
+            val extraList = ArrayList<DataCostTable>()
+
+            dataCollectedList.forEach { data ->
+                cost = DataCostTable.calculateCost(data, cost) { tableEntry, value ->
+                    if (!extraList.contains(tableEntry)) {
+                        extraList.add(tableEntry)
+                        extraValue += value
+                    }
+                }
+            }
+
+            //apply extra from rules 1 or 2 if present,
+            // assuming that percentage is applied to the total cost
+            cost *= extraValue
+
+            // Check for "Rule 3: The good citizen"
+            cost = DataCostTable.getBonusPercentage(cost, dataCollectedList.count())
 
             return cost
         }

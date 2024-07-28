@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.distinctUntilChanged
+import com.example.app.DataCostTable.Companion.calculateCost
 import com.usercentrics.sdk.Usercentrics
 import com.usercentrics.sdk.UsercentricsServiceConsent
 import com.usercentrics.sdk.v2.settings.data.UsercentricsService
@@ -70,7 +71,7 @@ class VirtualCostCounterViewModel : ViewModel() {
             when (consent.status) {
                 true -> {
                     findService(consent.templateId, services)?.let { service ->
-                        val cost = calculateCost(service).toInt()
+                        val cost = calculateCost(service.dataCollectedList).toInt()
                         _totalCost.value = _totalCost.value?.plus(cost)
                         Log.d(VirtualCostCounter, "${consent.dataProcessor} = $cost")
                     }
@@ -91,22 +92,6 @@ class VirtualCostCounterViewModel : ViewModel() {
         services: List<UsercentricsService>
     ): UsercentricsService? {
         return services.find { it.templateId == consentTemplateId }
-    }
-
-    private fun calculateCost(service: UsercentricsService): Double {
-        var cost = 0.0
-        var extraValue:Double = 1.0
-        service.dataCollectedList.forEach { data ->
-            cost = DataCostTable.calculateCost(data, cost) { extraValue += it }
-        }
-
-        //apply extra from rules 1 or 2 if present
-        cost *= extraValue
-
-        // Check for "Rule 3: The good citizen"
-        cost = DataCostTable.getBonusPercentage(cost, service.dataCollectedList.count())
-
-        return cost
     }
 
     sealed class VirtualCostCounterEvent(val data: Any?) {

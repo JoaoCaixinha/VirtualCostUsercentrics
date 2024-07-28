@@ -72,14 +72,16 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun setUserAsFirstTime(given: Boolean) {
-        val sharedPref = getSharedPreferences(getString(R.string.virtualcoststorage), Context.MODE_PRIVATE)
+        val sharedPref =
+            getSharedPreferences(getString(R.string.virtualcoststorage), Context.MODE_PRIVATE)
         val editor = sharedPref.edit()
         editor.putBoolean(getString(R.string.userasgivenforfirsttime), given)
         editor.apply()
     }
 
-   private fun asUserAsFirstTime() {
-        val sharedPref = getSharedPreferences(getString(R.string.virtualcoststorage), Context.MODE_PRIVATE)
+    private fun asUserAsFirstTime() {
+        val sharedPref =
+            getSharedPreferences(getString(R.string.virtualcoststorage), Context.MODE_PRIVATE)
         val result = sharedPref.getBoolean(getString(R.string.userasgivenforfirsttime), false)
         viewModel.setUserAsFirstTime(result)
     }
