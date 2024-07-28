@@ -11,6 +11,7 @@ import com.usercentrics.sdk.Usercentrics
 import com.usercentrics.sdk.UsercentricsServiceConsent
 import com.usercentrics.sdk.v2.settings.data.UsercentricsService
 
+const val COST_VALUES_DECIMALS: Int = 1
 const val VirtualCostCounter = "VirtualCostCounter"
 
 class VirtualCostCounterViewModel : ViewModel() {
@@ -74,7 +75,7 @@ class VirtualCostCounterViewModel : ViewModel() {
                     findService(consent.templateId, services)?.let { service ->
                         val cost = calculateCost(service.dataCollectedList)
                         _totalCost.value = _totalCost.value?.plus(cost)
-                        val costString = String.format("%.0f", cost)
+                        val costString = String.format("%.${COST_VALUES_DECIMALS}f", cost)
                         Log.d(VirtualCostCounter, "${consent.dataProcessor} $costString")
                     }
                 }
@@ -82,7 +83,7 @@ class VirtualCostCounterViewModel : ViewModel() {
                 false -> {}// ignore not consent given
             }
         }
-        val total =  String.format("%.0f", _totalCost.value)
+        val total =  String.format("%.${COST_VALUES_DECIMALS}f", _totalCost.value)
         Log.d(VirtualCostCounter, "Total = $total")
     }
 

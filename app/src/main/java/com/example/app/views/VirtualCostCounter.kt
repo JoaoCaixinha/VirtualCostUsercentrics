@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
+import com.example.app.COST_VALUES_DECIMALS
 import com.example.app.VirtualCostCounterViewModel
 
 @SuppressLint("DefaultLocale")
@@ -41,7 +42,7 @@ fun VirtualCostCounter(
     VirtualCostCounterLayout(
         {
             Text(
-                text = String.format("%.0f", totalCost),
+                text = String.format("%.${COST_VALUES_DECIMALS}f", totalCost),
                 fontSize = 150.sp,
             )
         },

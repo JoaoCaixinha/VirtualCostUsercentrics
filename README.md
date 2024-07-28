@@ -118,6 +118,8 @@ private fun calculate(
 5. calculates cost and verifies if rule 1 or 2 is applicable, as not very clear in challange, assume that those rule apply over total cost.
 6. ``fun calculateCost(dataCollectedList: List<String>): Double`` call calculate to calculate cost based on table values, apply rules if apllicable.
 
+As it is not clear in the statement whether costs should be presented with or without decimal values. The calculation data type is **Double** but it is being presented without decimal values, which is defined in **COST_VALUES_DECIMALS** = 0
+
 
 ## 4. Display Total Cost in UI
 The application UI as mentioned in the statement, consisting of a button to display the banner and two labels, one informative and another that represents the total cost, is implemented in the Compose view **VirtualCostCounter**,
