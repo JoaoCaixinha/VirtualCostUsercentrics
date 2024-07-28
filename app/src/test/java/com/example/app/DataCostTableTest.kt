@@ -74,4 +74,24 @@ class DataCostTableTest {
         assertEquals(14.796, cost, 0.1)
     }
 
+    @Test
+    fun `test 2 fields from rule 1, should multiply one time, and apply bonus (rule 3)`() {
+        val dataCollectedList = ArrayList<String>()
+        dataCollectedList.add(DataCostTable.BANK_DETAILS.toString()) // 5
+        dataCollectedList.add(DataCostTable.PURCHASE_ACTIVITY.toString()) // 6
+
+        var cost = DataCostTable.calculateCost(dataCollectedList)
+        assertEquals(10.89, cost, 0.1)
+    }
+
+    @Test
+    fun `test 2 fields from rule 2, should multiply one time, and apply bonus (rule 3)`() {
+        val dataCollectedList = ArrayList<String>()
+        dataCollectedList.add(DataCostTable.SEARCH_TERMS.toString()) // 0
+        dataCollectedList.add(DataCostTable.GEOGRAPHIC_LOCATION.toString()) // 7
+
+        var cost = DataCostTable.calculateCost(dataCollectedList)
+        assertEquals(8.001, cost, 0.1)
+    }
+
 }

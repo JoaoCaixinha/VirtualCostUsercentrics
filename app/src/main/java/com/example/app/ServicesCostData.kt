@@ -2,6 +2,11 @@ package com.example.app
 
 const val MIN_BONUS_VALUE: Int = 4
 
+enum class Rule {
+    Rule1,
+    Rule2,
+}
+
 enum class DataCostTable(val dataCollected: String) {
     // ON TABLE
     CONFIGURATION_OF_APP_SETTINGS("Configuration of app settings "),
@@ -47,30 +52,28 @@ enum class DataCostTable(val dataCollected: String) {
 
         private fun getExtraPercentageCost(
             data: DataCostTable,
-            onExtraFound: (DataCostTable, Double) -> Unit
+            onExtraFound: (Rule, Double) -> Unit
         ): Unit {
             return when (data) {
-                PURCHASE_ACTIVITY, BANK_DETAILS, CREDIT_DEBIT_CARD_NUMBER -> onExtraFound(
-                    data,
-                    0.10
-                )
-
-                SEARCH_TERMS, GEOGRAPHIC_LOCATION, IP_ADDRESS -> onExtraFound(data, 0.27)
+                PURCHASE_ACTIVITY, BANK_DETAILS, CREDIT_DEBIT_CARD_NUMBER ->
+                    onExtraFound(Rule.Rule1, 0.10)
+                SEARCH_TERMS, GEOGRAPHIC_LOCATION, IP_ADDRESS ->
+                    onExtraFound(Rule.Rule2, 0.27)
                 else -> {}
             }
         }
 
-        fun getBonusPercentage(cost: Double, count: Int): Double {
+        private fun getBonusPercentage(cost: Double, count: Int): Double {
             return when {
                 count <= MIN_BONUS_VALUE -> cost - (cost * 0.10)
                 else -> cost
             }
         }
 
-        fun calculateCost(
+        private fun calculate(
             data: String,
             initialCost: Double,
-            onExtraFound: (DataCostTable, Double) -> Unit
+            onExtraFound: (Rule, Double) -> Unit
         ): Double {
             var cost = initialCost
             val dataCollected = DataCostTable.getEnumFromDataCollectedString(data)
@@ -91,12 +94,12 @@ enum class DataCostTable(val dataCollected: String) {
         fun calculateCost(dataCollectedList: List<String>): Double {
             var cost = 0.0
             var extraValue = 1.0
-            val extraList = ArrayList<DataCostTable>()
+            val extraList = ArrayList<Rule>()
 
             dataCollectedList.forEach { data ->
-                cost = DataCostTable.calculateCost(data, cost) { tableEntry, value ->
-                    if (!extraList.contains(tableEntry)) {
-                        extraList.add(tableEntry)
+                cost = DataCostTable.calculate(data, cost) { rule, value ->
+                    if (!extraList.contains(rule)) {
+                        extraList.add(rule)
                         extraValue += value
                     }
                 }
