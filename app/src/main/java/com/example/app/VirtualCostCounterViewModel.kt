@@ -1,5 +1,6 @@
 package com.example.app
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -17,8 +18,8 @@ class VirtualCostCounterViewModel : ViewModel() {
     val virtualCostCounterEvents: LiveData<VirtualCostCounterEvent> =
         _virtualCostCounterEvents
 
-    private val _totalCost = MutableLiveData<Int>(0)
-    val totalCost: LiveData<Int> = _totalCost.distinctUntilChanged()
+    private val _totalCost = MutableLiveData<Double>(0.0)
+    val totalCost: LiveData<Double> = _totalCost.distinctUntilChanged()
 
     private val _isFirstTime = MutableLiveData<Boolean>(true)
     val isFirstTime: LiveData<Boolean> = _isFirstTime.distinctUntilChanged()
@@ -63,23 +64,25 @@ class VirtualCostCounterViewModel : ViewModel() {
     /*
    * handles consent accept and calculates cost according per service
    * */
+    @SuppressLint("DefaultLocale")
     fun applyConsent(consents: List<UsercentricsServiceConsent>?) {
-        _totalCost.value = 0
+        _totalCost.value = 0.0
         val services = Usercentrics.instance.getCMPData().services
         consents?.forEach { consent ->
             when (consent.status) {
                 true -> {
                     findService(consent.templateId, services)?.let { service ->
-                        val cost = calculateCost(service.dataCollectedList).toInt()
+                        val cost = calculateCost(service.dataCollectedList)
                         _totalCost.value = _totalCost.value?.plus(cost)
-                        Log.d(VirtualCostCounter, "${consent.dataProcessor} = $cost")
+                        val costString = String.format("%.0f", cost)
+                        Log.d(VirtualCostCounter, "${consent.dataProcessor} $costString")
                     }
                 }
 
                 false -> {}// ignore not consent given
             }
         }
-        val total = _totalCost.value
+        val total =  String.format("%.0f", _totalCost.value)
         Log.d(VirtualCostCounter, "Total = $total")
     }
 
